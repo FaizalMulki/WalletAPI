@@ -1,0 +1,32 @@
+ public async Task<String>GetDetails()
+        {
+            string ContactUs = "https://125.19.66.195/kbxwnetc/RechargeCustomerAccount";
+            string MyProxyHostString = "172.16.240.153";
+            int MyProxyPort = 8080;
+            //Bypass SSL Verification
+            ServicePointManager.ServerCertificateValidationCallback +=
+                delegate (object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors) { return true; };
+
+            var request = (HttpWebRequest)WebRequest.Create(ContactUs);
+            request.Proxy = new WebProxy(MyProxyHostString, MyProxyPort);
+            request.Method = "POST";
+            request.ContentType = "application/json";
+            request.Accept = "application/json";
+
+            RequestClass obj = new RequestClass();
+
+            obj.flag = "RECH";
+            obj.etcCustId = "";
+            obj.vrn = "KA19";
+            obj.rechargeTxnid = "1234";
+            obj.rechargeAmt = "120.00";
+
+            string json = JsonConvert.SerializeObject(obj);
+         //   StreamWriter requestWriter = new StreamWriter(request.GetRequestStream());
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var response = await client.PostAsJsonAsync(ContactUs, obj);
+            string result = response.Content.ReadAsStringAsync().Result;
+            return null;
+        }
